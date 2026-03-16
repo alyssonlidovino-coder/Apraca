@@ -3,55 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Praça | Experimento Social</title>
+    <title>A Praça | Identidade e Conexão</title>
     <style>
-        :root { --bg: #fdfaf6; --text: #333; --accent: #5d5dff; --card: #ffffff; }
-        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        header { text-align: center; padding: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
-        .container { max-width: 500px; margin: 0 auto; }
+        :root { --bg: #f4f1ea; --text: #2c2c2c; --accent: #4a90e2; --card: #ffffff; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; }
         
-        .post-box { background: var(--card); padding: 15px; border: 2px solid #000; border-radius: 8px; margin-bottom: 20px; }
-        textarea { width: 100%; border: none; font-size: 1rem; outline: none; margin-bottom: 10px; background: transparent; }
-        button { background: #000; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
+        /* Tela de Login */
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
+        .login-box { background: var(--card); padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
         
-        .feed-item { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
-        .meta { font-size: 0.7rem; color: #888; margin-bottom: 5px; }
-        .no-metrics { font-size: 0.75rem; color: #aaa; margin-top: 10px; display: block; border-top: 1px solid #f9f9f9; padding-top: 5px; }
+        /* Interface Principal */
+        .container { max-width: 600px; width: 100%; padding: 20px; display: none; }
+        header { text-align: center; margin-bottom: 30px; }
+        .post-box { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-size: 1rem; resize: none; outline: none; margin-bottom: 10px; box-sizing: border-box; }
+        input[type="text"] { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        button { background: var(--text); color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background: var(--accent); transform: translateY(-2px); }
+
+        .feed-item { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); animation: fadeIn 0.5s ease; }
+        .user-info { font-weight: bold; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .timestamp { font-size: 0.75rem; color: #888; font-weight: normal; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>A Praça</h1>
-    <p>Conexões sem algoritmos ou curtidas.</p>
-</header>
-
-<div class="container">
-    <div class="post-box">
-        <textarea id="postInput" placeholder="O que você quer contar hoje?" rows="3"></textarea>
-        <button onclick="publicar()">Compartilhar na Praça</button>
-    </div>
-
-    <div id="feed">
-        <div class="feed-item">
-            <div class="meta">Postado por Alguém • Agora</div>
-            <p>Este é um exemplo de como as pessoas interagem aqui. Sinta a diferença de não ver números.</p>
-            <span class="no-metrics">Apenas a mensagem importa.</span>
+    <div id="login-screen">
+        <div class="login-box">
+            <h1>Bem-vindo à Praça</h1>
+            <p>Como você gostaria de ser chamado hoje?</p>
+            <input type="text" id="username-input" placeholder="Seu nome ou apelido...">
+            <button onclick="fazerLogin()">Entrar na Praça</button>
         </div>
     </div>
-</div>
+
+    <div class="container" id="main-content">
+        <header>
+            <h1>A Praça</h1>
+            <p id="welcome-msg"></p>
+            <button onclick="fazerLogout()" style="padding: 5px 15px; font-size: 0.8rem; background: #e74c3c;">Sair</button>
+        </header>
+
+        <div class="post-box">
+            <textarea id="postInput" placeholder="O que você quer compartilhar com a comunidade?" rows="3"></textarea>
+            <button onclick="publicar()">Publicar na Praça</button>
+        </div>
+
+        <div id="feed">
+            </div>
+    </div>
 
 <script>
+    // Verifica se já existe um usuário salvo no navegador
+    window.onload = function() {
+        const usuarioSalvo = localStorage.getItem('usuario_praca');
+        if (usuarioSalvo) {
+            logar(usuarioSalvo);
+        }
+    };
+
+    function fazerLogin() {
+        const nome = document.getElementById('username-input').value;
+        if (nome.trim() !== "") {
+            localStorage.setItem('usuario_praca', nome);
+            logar(nome);
+        } else {
+            alert("Por favor, diga-nos seu nome para entrar.");
+        }
+    }
+
+    function logar(nome) {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('main-content').style.display = 'block';
+        document.getElementById('welcome-msg').innerText = "Olá, " + nome + ". Sinta-se em casa.";
+    }
+
+    function fazerLogout() {
+        localStorage.removeItem('usuario_praca');
+        location.reload();
+    }
+
     function publicar() {
         const texto = document.getElementById('postInput').value;
+        const nome = localStorage.getItem('usuario_praca');
+        
         if (texto.trim() === "") return;
 
+        const data = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+        
         const novoPost = document.createElement('div');
         novoPost.className = 'feed-item';
         novoPost.innerHTML = `
-            <div class="meta">Postado por Você • Agora</div>
+            <div class="user-info">
+                👤 ${nome} <span class="timestamp">• hoje às ${data}</span>
+            </div>
             <p>${texto}</p>
-            <span class="no-metrics">Ninguém pode curtir, mas todos podem ler.</span>
         `;
 
         const feed = document.getElementById('feed');
