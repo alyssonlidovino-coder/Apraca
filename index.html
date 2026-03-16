@@ -3,113 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Praça | Identidade e Conexão</title>
+    <title>A Praça | Interação Real</title>
     <style>
-        :root { --bg: #f4f1ea; --text: #2c2c2c; --accent: #4a90e2; --card: #ffffff; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; }
-        
-        /* Tela de Login */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; }
-        .login-box { background: var(--card); padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; }
-        
-        /* Interface Principal */
-        .container { max-width: 600px; width: 100%; padding: 20px; display: none; }
-        header { text-align: center; margin-bottom: 30px; }
-        .post-box { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        
-        textarea { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 10px; font-size: 1rem; resize: none; outline: none; margin-bottom: 10px; box-sizing: border-box; }
-        input[type="text"] { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        
-        button { background: var(--text); color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background: var(--accent); transform: translateY(-2px); }
-
-        .feed-item { background: var(--card); padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 6px solid var(--accent); animation: fadeIn 0.5s ease; }
-        .user-info { font-weight: bold; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
-        .timestamp { font-size: 0.75rem; color: #888; font-weight: normal; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .hidden { display: none !important; }
+        :root { --bg: #f4f1ea; --text: #2c2c2c; --accent: #4a90e2; }
+        body { font-family: sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 500px; width: 100%; display: none; }
+        #login-screen { text-align: center; margin-top: 100px; }
+        .post-box { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        textarea { width: 100%; border: 1px solid #ddd; border-radius: 5px; padding: 10px; box-sizing: border-box; }
+        button { background: #000; color: #fff; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 10px; }
+        .feed-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; width: 100%; border-left: 5px solid var(--accent); }
+        .user-info { font-weight: bold; color: var(--accent); font-size: 0.9rem; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="login-box">
-            <h1>Bem-vindo à Praça</h1>
-            <p>Como você gostaria de ser chamado hoje?</p>
-            <input type="text" id="username-input" placeholder="Seu nome ou apelido...">
-            <button onclick="fazerLogin()">Entrar na Praça</button>
-        </div>
+        <h1>A Praça</h1>
+        <input type="text" id="username-input" placeholder="Seu nome...">
+        <button onclick="fazerLogin()">Entrar</button>
     </div>
 
     <div class="container" id="main-content">
         <header>
             <h1>A Praça</h1>
-            <p id="welcome-msg"></p>
-            <button onclick="fazerLogout()" style="padding: 5px 15px; font-size: 0.8rem; background: #e74c3c;">Sair</button>
+            <p id="welcome"></p>
         </header>
 
         <div class="post-box">
-            <textarea id="postInput" placeholder="O que você quer compartilhar com a comunidade?" rows="3"></textarea>
+            <textarea id="postInput" placeholder="O que você está pensando?" rows="3"></textarea>
             <button onclick="publicar()">Publicar na Praça</button>
         </div>
 
-        <div id="feed">
-            </div>
+        <div id="feed">Carregando mensagens...</div>
     </div>
 
-<script>
-    // Verifica se já existe um usuário salvo no navegador
-    window.onload = function() {
-        const usuarioSalvo = localStorage.getItem('usuario_praca');
-        if (usuarioSalvo) {
-            logar(usuarioSalvo);
+    <script>
+        // COLE O SEU LINK DA PLANILHA AQUI EMBAIXO
+        const URL_PLANILHA = "SUA_URL_AQUI"; 
+
+        function fazerLogin() {
+            const nome = document.getElementById('username-input').value;
+            if (nome) {
+                localStorage.setItem('usuario_praca', nome);
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('welcome').innerText = "Olá, " + nome;
+                carregarPosts();
+            }
         }
-    };
 
-    function fazerLogin() {
-        const nome = document.getElementById('username-input').value;
-        if (nome.trim() !== "") {
-            localStorage.setItem('usuario_praca', nome);
-            logar(nome);
-        } else {
-            alert("Por favor, diga-nos seu nome para entrar.");
+        async function publicar() {
+            const texto = document.getElementById('postInput').value;
+            const nome = localStorage.getItem('usuario_praca');
+            if (!texto) return;
+
+            // Envia para a planilha
+            await fetch(URL_PLANILHA, {
+                method: 'POST',
+                body: JSON.stringify({ nome: nome, conteudo: texto })
+            });
+
+            document.getElementById('postInput').value = '';
+            carregarPosts(); // Atualiza a tela após postar
         }
-    }
 
-    function logar(nome) {
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('main-content').style.display = 'block';
-        document.getElementById('welcome-msg').innerText = "Olá, " + nome + ". Sinta-se em casa.";
-    }
+        async function carregarPosts() {
+            try {
+                const response = await fetch(URL_PLANILHA);
+                const posts = await response.json();
+                const feed = document.getElementById('feed');
+                feed.innerHTML = ''; 
 
-    function fazerLogout() {
-        localStorage.removeItem('usuario_praca');
-        location.reload();
-    }
+                posts.forEach(post => {
+                    const div = document.createElement('div');
+                    div.className = 'feed-item';
+                    div.innerHTML = `<div class="user-info">👤 ${post[0]}</div><p>${post[1]}</p>`;
+                    feed.appendChild(div);
+                });
+            } catch (e) {
+                console.log("Erro ao carregar ou feed vazio.");
+            }
+        }
 
-    function publicar() {
-        const texto = document.getElementById('postInput').value;
-        const nome = localStorage.getItem('usuario_praca');
-        
-        if (texto.trim() === "") return;
+        // Verifica se já está logado
+        if (localStorage.getItem('usuario_praca')) {
+            document.getElementById('username-input').value = localStorage.getItem('usuario_praca');
+            fazerLogin();
+        }
 
-        const data = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-        
-        const novoPost = document.createElement('div');
-        novoPost.className = 'feed-item';
-        novoPost.innerHTML = `
-            <div class="user-info">
-                👤 ${nome} <span class="timestamp">• hoje às ${data}</span>
-            </div>
-            <p>${texto}</p>
-        `;
-
-        const feed = document.getElementById('feed');
-        feed.insertBefore(novoPost, feed.firstChild);
-        document.getElementById('postInput').value = "";
-    }
-</script>
-
+        // Atualiza a tela a cada 10 segundos para ver posts de outros alunos
+        setInterval(carregarPosts, 10000);
+    </script>
 </body>
 </html>
