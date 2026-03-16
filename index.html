@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Praça | Experimento Social</title>
+    <style>
+        :root { --bg: #fdfaf6; --text: #333; --accent: #5d5dff; --card: #ffffff; }
+        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        header { text-align: center; padding: 20px; border-bottom: 1px solid #ddd; margin-bottom: 20px; }
+        .container { max-width: 500px; margin: 0 auto; }
+        
+        .post-box { background: var(--card); padding: 15px; border: 2px solid #000; border-radius: 8px; margin-bottom: 20px; }
+        textarea { width: 100%; border: none; font-size: 1rem; outline: none; margin-bottom: 10px; background: transparent; }
+        button { background: #000; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
+        
+        .feed-item { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+        .meta { font-size: 0.7rem; color: #888; margin-bottom: 5px; }
+        .no-metrics { font-size: 0.75rem; color: #aaa; margin-top: 10px; display: block; border-top: 1px solid #f9f9f9; padding-top: 5px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>A Praça</h1>
+    <p>Conexões sem algoritmos ou curtidas.</p>
+</header>
+
+<div class="container">
+    <div class="post-box">
+        <textarea id="postInput" placeholder="O que você quer contar hoje?" rows="3"></textarea>
+        <button onclick="publicar()">Compartilhar na Praça</button>
+    </div>
+
+    <div id="feed">
+        <div class="feed-item">
+            <div class="meta">Postado por Alguém • Agora</div>
+            <p>Este é um exemplo de como as pessoas interagem aqui. Sinta a diferença de não ver números.</p>
+            <span class="no-metrics">Apenas a mensagem importa.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function publicar() {
+        const texto = document.getElementById('postInput').value;
+        if (texto.trim() === "") return;
+
+        const novoPost = document.createElement('div');
+        novoPost.className = 'feed-item';
+        novoPost.innerHTML = `
+            <div class="meta">Postado por Você • Agora</div>
+            <p>${texto}</p>
+            <span class="no-metrics">Ninguém pode curtir, mas todos podem ler.</span>
+        `;
+
+        const feed = document.getElementById('feed');
+        feed.insertBefore(novoPost, feed.firstChild);
+        document.getElementById('postInput').value = "";
+    }
+</script>
+
+</body>
+</html>
